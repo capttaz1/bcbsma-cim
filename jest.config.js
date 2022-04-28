@@ -2,6 +2,7 @@
 // https://jestjs.io/docs/en/configuration.html
 
 module.exports = {
+    testTimeout: 60000,
     // All imported modules in your tests should be mocked automatically
     // automock: false,
 
@@ -66,7 +67,10 @@ module.exports = {
     moduleFileExtensions: ['js', 'json'],
 
     // A map from regular expressions to module names that allow to stub out resources with a single module
-    // moduleNameMapper: {},
+    moduleNameMapper: {
+        '@/config': '<rootDir>/src/config',
+        '@/api': '<rootDir>/src/api',
+    },
 
     // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
     // modulePathIgnorePatterns: [],

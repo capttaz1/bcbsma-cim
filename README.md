@@ -3,7 +3,7 @@
 ### Folder Structure
 
 -   src
-    app.js App entry point
+    server.js App entry point
     -   api Express route controllers for all the endpoints of the app
     -   config Environment variables and configuration related modules
     -   jobs Jobs definitions for agenda.js
