@@ -1,18 +1,17 @@
 import { Router } from 'express';
 import { Container } from 'typedi';
-import StepService from '../../services/steps';
 
 const route = Router();
 
 export default app => {
     app.use('/steps', route);
 
-    route.get('/all', async (req, res, next) => {
+    route.get('/', async (req, res, next) => {
         const logger = Container.get('logger');
         logger.debug('Calling the Step service endpoint with body: %o', req.body);
 
         try {
-            const stepServiceInstance = new StepService();
+            const stepServiceInstance = Container.get('StepService');
             const steps = await stepServiceInstance.read();
             return res.json(steps);
         } catch (error) {

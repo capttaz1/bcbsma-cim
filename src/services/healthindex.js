@@ -1,36 +1,61 @@
 import { Container } from 'typedi';
 import * as dfd from 'danfojs-node';
 
+/**
+ * Service endpoint for Health Index data
+ */
 export default class HealthIndexService {
-    // get all health indexes
+    /**
+     * HRV Service constructor method
+     * @constructor
+     */
+    constructor() {
+        this.logger = Container.get('logger');
+        this.repository = Container.get('HealthIndexRepository');
+    }
+
+    /**
+     * Service status method
+     * @return {string} - "OK"
+     */
+    async ping() {
+        return 'OK';
+    }
+
+    /**
+     * Service CRUD method - returns all data or data filtered by the input value
+     * @return {string} - JSON representation of health index data
+     */
     async read() {
-        const logger = Container.get('logger');
-
         try {
-            const healthIndexModel = Container.get('healthIndexModel');
-            const healthIndexes = await healthIndexModel.find();
+            const data = await this.repository.read();
 
-            let data = JSON.parse(JSON.stringify(healthIndexes));
-            let s = await this.createDataFrame(data);
-            return s;
-        } catch (e) {
-            logger.error('Error in the Health Index Service read method %o: ', e);
-            throw e;
+            const arrData = JSON.parse(JSON.stringify(data));
+
+            const jsonData = await this.createDataFrame(arrData);
+
+            return jsonData;
+        } catch (error) {
+            this.logger.error('Error in the Health Index Service read method %o: ', error);
+            throw error;
         }
     }
 
+    /**
+     * Creates a DataFrame for data manipulation and cleanup
+     * @param {array} data - Array of health index model objects
+     * @return {string} - Returns a string representation of JSON formatted data
+     */
     async createDataFrame(data) {
-        const logger = Container.get('logger');
-
         try {
-            let s = new dfd.DataFrame(data);
-            s.drop({ columns: ['_id'], inplace: true });
+            const df = new dfd.DataFrame(data);
 
-            let f = dfd.toJSON(s);
-            return f;
-        } catch (e) {
-            logger.error('Error creating a Health Index DataFrame: %o', e);
-            throw e;
+            df.drop({ columns: ['_id'], inplace: true });
+
+            return dfd.toJSON(df);
+        } catch (error) {
+            this.logger.error('Error creating a Health Index DataFrame: %o', error);
+            throw error;
         }
     }
 }

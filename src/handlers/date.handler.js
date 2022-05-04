@@ -1,22 +1,40 @@
 import moment from 'moment';
+import Container from 'typedi';
 
-const dateHandler = {};
+/**
+ * Centralized class for Date Handling
+ */
+export default class DateHandler {
+    /**
+     * Date Handler constructor
+     * @constructor
+     */
+    constructor() {
+        this.logger = Container.get('logger');
+    }
 
-// validate column is a date column
-function isValidDate(x) {
-	var d = moment(x, 'YYYY-MM-DDTHH:mm:ss.000Z', true);
-	if (d == null || !d.isValid()) return false;
+    /**
+     * Produces a simple, localized date
+     *
+     * @param {string} value - A string representation of a date
+     * @return {string} value - A localized string of a formatted date
+     */
+    simpleDate(value) {
+        try {
+            let valid = true;
+            const newDate = moment(value, 'YYYY-MM-DDTHH:mm:ss.000Z', true);
+            if (newDate == null || !newDate.isValid()) {
+                valid = false;
+            }
 
-	return true;
+            if (valid) {
+                return moment(value).format('M/D/YYYY');
+            } else {
+                return value;
+            }
+        } catch (error) {
+            this.logger.error('An error occurred in the date handler: %o', error);
+            throw error;
+        }
+    }
 }
-
-// cleanup date
-dateHandler.simpleDate = (x) => {
-	if (isValidDate(x)) {
-		return moment(x).format('M/D/YYYY');
-	} else {
-		return x;
-	}
-};
-
-export default dateHandler;

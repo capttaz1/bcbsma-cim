@@ -12,13 +12,13 @@ export default app => {
 
         logger.debug('Calling the Forecast service endpoint with body: %o', req.body);
 
-        let steps = req.query.steps || 0;
-        let water = req.query.water || 0;
-        let bmi = req.query.bmi || 0;
-        let hrv = req.query.hrv || 0;
+        const steps = req.query.steps || 0;
+        const water = req.query.water || 0;
+        const bmi = req.query.bmi || 0;
+        const hrv = req.query.hrv || 0;
 
         try {
-            let prediction = await forecastInstanceService.read(steps, water, bmi, hrv);
+            const prediction = await forecastInstanceService.read(steps, water, bmi, hrv);
             return res.json(prediction);
         } catch (error) {
             logger.error('Error in the Forecast router: %o', error);

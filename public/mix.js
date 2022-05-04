@@ -32,7 +32,7 @@ function PopulateMixChart(data) {
                     data: Object.values(dataArray).map(e => e.steps),
                     borderColor: 'rgba(0, 0, 0, 0)',
                     backgroundColor: 'rgba(100, 149, 237, 1)',
-                    order: 1,
+                    order: 0,
                     yAxisID: 'y',
                 },
                 {
@@ -40,34 +40,30 @@ function PopulateMixChart(data) {
                     data: Object.values(dataArray).map(e => e.hrv),
                     borderColor: 'rgba(0, 0, 0, 0)',
                     backgroundColor: 'rgba(232, 244, 140, 1)',
+                    fill: true,
                     type: 'line',
-                    order: 0,
+                    order: 1,
                     yAxisID: 'y1',
                 },
             ],
         },
         options: {
             scales: {
-                yAxes: [
-                    {
-                        id: 'y',
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                    },
-                    {
-                        id: 'y1',
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                    },
-                ],
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                },
             },
         },
     });
 }
 
-$('#renderMixBtn').click(function () {
-    console.log('Loading Data');
+$(document).ready(function () {
     loadMixData();
 });

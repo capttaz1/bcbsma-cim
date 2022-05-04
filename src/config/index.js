@@ -19,7 +19,12 @@ export default {
     /**
      * The mongo db connection url
      */
-    databaseURL: process.env.MONGODB_URI,
+    databaseURL: 'mongodb://127.0.0.1:27017/local',
+
+    /**
+     * The mongo db database to open
+     */
+    databaseName: 'local',
 
     /**
      * Your secret sauce

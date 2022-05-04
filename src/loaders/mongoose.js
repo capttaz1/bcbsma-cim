@@ -1,21 +1,13 @@
-import mongoose from 'mongoose';
+import { MongoClient } from 'mongodb';
 import config from '@/config';
+import Container from 'typedi';
 
 export default async () => {
-    await mongoose
-        .connect(config.databaseURL, {
-            useCreateIndex: true,
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-        })
-        .then(db => {
-            console.log(`Connected to MongoDb, DB name: "${db.connections[0].name}"`);
-            return db;
-        })
-        .catch(error => {
-            console.error('Error connecting to mongo', error);
-        });
+    const uri = config.databaseURL;
 
-    return mongoose;
+    const client = new MongoClient(uri);
+
+    Container.set('client', client);
+
+    return client;
 };

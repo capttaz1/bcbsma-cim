@@ -1,33 +1,54 @@
-import { Container, Service } from 'typedi';
+import { Container } from 'typedi';
 import * as brain from 'brain.js';
-import HealthIndexService from './healthindex';
 
+/**
+ * Service endpoint for hrv data
+ */
 export default class ForecastService {
-    // get a forecast
+    /**
+     * Forecast Service constructor method
+     * @constructor
+     */
+    constructor() {
+        this.logger = Container.get('logger');
+        this.healthIndexInstance = Container.get('HealthIndexService');
+    }
+
+    /**
+     * Service CRUD method - returns forecast data for health indexes
+     *
+     * @param {number} steps - 1 if achieved the daily goal, 0 if not
+     * @param {number} water - 1 if achieved the daily goal, 0 if not
+     * @param {number} bmi - 1 if within the correct BMI, 0 if not
+     * @param {number} hrv - 1 if achieved the daily goal, 0 if not
+     * @return {string} - JSON representation of the forecast
+     */
     async read(steps, water, bmi, hrv) {
-        const logger = Container.get('logger');
-
         try {
-            const healthIndexInstance = new HealthIndexService();
-            const healthIndexes = await healthIndexInstance.read();
+            const healthIndexes = await this.healthIndexInstance.read();
 
-            let data = this.createTrainingData(healthIndexes);
+            const data = this.createTrainingData(healthIndexes);
 
-            let prediction = this.predict(data, steps, water, bmi, hrv);
+            const prediction = this.predict(data, steps, water, bmi, hrv);
 
             return prediction;
         } catch (e) {
-            logger.error('Error in the StepService read method %o: ', e);
+            this.logger.error('Error in the StepService read method %o: ', e);
             throw e;
         }
     }
 
+    /**
+     * Creates an array of data for input into a model for training
+     *
+     * @param {string} data - A MongoDB collection of Health Index data
+     * @return {array} training - an array of model data
+     */
     createTrainingData(data) {
-        const logger = Container.get('logger');
-        let training = [];
+        const training = [];
         data.forEach(element => {
             if (element.index == 1) {
-                let e = {
+                const e = {
                     input: {
                         steps: element.steps,
                         water: element.water,
@@ -38,7 +59,7 @@ export default class ForecastService {
                 };
                 training.push(e);
             } else {
-                let e = {
+                const e = {
                     input: {
                         steps: element.steps,
                         water: element.water,
@@ -53,9 +74,17 @@ export default class ForecastService {
         return training;
     }
 
+    /**
+     * Trains and predicts an outcome based on Health Index data
+     *
+     * @param {number} data - Model data
+     * @param {number} steps - Steps indicator for prediction
+     * @param {number} water - Water indicator for prediction
+     * @param {number} bmi - BMI indicator for prediction
+     * @param {number} hrv - HRV indicator for prediction
+     * @return {string} output - JSON representation of the prediction
+     */
     predict(data, steps, water, bmi, hrv) {
-        const logger = Container.get('logger');
-
         try {
             const net = new brain.NeuralNetwork();
 
@@ -65,7 +94,7 @@ export default class ForecastService {
 
             return output;
         } catch (error) {
-            logger.error('Error creating a Health Index prediction: %o', error);
+            this.logger.error('Error creating a Health Index prediction: %o', error);
             throw error;
         }
     }

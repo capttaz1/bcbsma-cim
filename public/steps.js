@@ -20,7 +20,7 @@ function PopulateChart(data) {
         dataArray[item.date] = { steps: item.value };
     });
 
-    let ctx = document.getElementById('myChart').getContext('2d');
+    let ctx = document.getElementById('stepChart').getContext('2d');
     let myChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -31,30 +31,26 @@ function PopulateChart(data) {
                     data: Object.values(dataArray).map(e => e.steps),
                     borderColor: 'rgba(0, 0, 0, 0)',
                     backgroundColor: 'rgba(100, 149, 237, 1)',
-                    yAxisID: 'steps',
+                    fill: true,
                 },
             ],
         },
         options: {
             scales: {
-                yAxes: [
-                    {
-                        id: 'steps',
-                        ticks: {
-                            beginAtZero: true,
-                        },
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Steps',
-                        },
+                steps: {
+                    ticks: {
+                        beginAtZero: true,
                     },
-                ],
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Steps',
+                    },
+                },
             },
         },
     });
 }
 
-$('#renderBtn').click(function () {
-    console.log('Loading Data');
+$(document).ready(function () {
     loadData();
 });

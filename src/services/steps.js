@@ -1,51 +1,69 @@
 import { Container } from 'typedi';
 import * as dfd from 'danfojs-node';
-import moment from 'moment';
-import e from 'express';
+import DateHandler from '../handlers/date.handler';
 
+/**
+ * Service endpoint for step data
+ */
 export default class StepService {
-    // get all steps
+    /**
+     * Step Service constructor method
+     * @constructor
+     */
+    constructor() {
+        this.logger = Container.get('logger');
+        this.repository = Container.get('StepRepository');
+        this.dateHandler = new DateHandler();
+    }
+
+    /**
+     * Service status method
+     * @return {string} - "OK"
+     */
+    async ping() {
+        return 'OK';
+    }
+
+    /**
+     * Service CRUD method - returns all data or data filtered by the input value
+     * @return {string} - JSON representation of step data
+     */
     async read() {
-        const logger = Container.get('logger');
-
         try {
-            const stepModel = Container.get('stepModel');
-            const steps = await stepModel.find();
+            const data = await this.repository.read('2020-11-01');
 
-            let data = JSON.parse(JSON.stringify(steps));
-            let s = await this.createDataFrame(data);
-            return s;
-        } catch (e) {
-            logger.error('Error in the StepService read method %o: ', e);
-            throw e;
+            const arrData = JSON.parse(JSON.stringify(data));
+
+            const jsonData = await this.createDataFrame(arrData);
+
+            return jsonData;
+        } catch (error) {
+            this.logger.error('Error in the Step Service read method: %o', error);
+            throw error;
         }
     }
 
+    /**
+     * Creates a DataFrame for data manipulation and cleanup
+     * @param {array} data - Array of step model objects
+     * @return {string} - Returns a string representation of JSON formatted data
+     */
     async createDataFrame(data) {
-        const logger = Container.get('logger');
-
         try {
-            let s = new dfd.DataFrame(data);
-            s.drop({ columns: ['_id', '__v'], inplace: true });
+            const df = new dfd.DataFrame(data);
 
-            let df_new = s.applyMap(this.cleanDataFrame);
-            let df_group = df_new.groupby(['date']).sum();
-            df_group.rename({ value_sum: 'value' }, { inplace: true });
-            let f = dfd.toJSON(df_group);
-            return f;
-        } catch (e) {
-            logger.error('Error creating a Step DataFrame: %o', e);
-            throw e;
-        }
-    }
+            df.drop({ columns: ['_id', '__v'], inplace: true });
 
-    cleanDataFrame(data) {
-        const date = moment(data, 'YYYY-MM-DDTHH:mm:ss.000Z', true);
+            const dfNew = df.applyMap(this.dateHandler.simpleDate);
 
-        if (date.isValid()) {
-            return date.format('MM-DD-YYYY');
-        } else {
-            return data;
+            const dfGroup = dfNew.groupby(['date']).sum();
+
+            dfGroup.rename({ value_sum: 'value' }, { inplace: true });
+
+            return dfd.toJSON(dfGroup);
+        } catch (error) {
+            this.logger.error('Error creating a Step DataFrame: %o', error);
+            throw error;
         }
     }
 }

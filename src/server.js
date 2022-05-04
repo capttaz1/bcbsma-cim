@@ -1,14 +1,18 @@
-import app from './app';
-import config from './config';
-import Logger from './loaders/logger';
+import 'reflect-metadata'; // We need this for decorators ... but ...
+import 'regenerator-runtime/runtime';
+import 'module-alias/register';
+import 'dotenv/config';
 
-app.listen(config.port, () => {
-    Logger.info(`
-            ##################################################
-                Server listening on port: ${config.port}
-            ##################################################
-        `);
-}).on('error', err => {
-    Logger.error(err);
-    process.exit(1);
-});
+import express from 'express';
+
+const app = express();
+/**
+ * Loads express and dependency injected items
+ */
+async function startServer() {
+    await require('./loaders').default(app);
+}
+
+startServer();
+
+export default app;

@@ -1,17 +1,8 @@
 import request from 'supertest';
-import app from '../src/app';
-import mongoose from 'mongoose';
+import app from '../src/server';
+import { describe, it } from 'jest';
 
 describe('loading express', () => {
-    beforeAll(async () => {
-        await new Promise(resolve => setTimeout(resolve, 3000)); // 3 sec
-    });
-
-    afterAll(async () => {
-        await mongoose.connection.close();
-        await mongoose.disconnect();
-    });
-
     /**
      * GET status call
      */

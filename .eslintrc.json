@@ -1,10 +1,18 @@
 {
     "env": {
-        "node": true,
-        "es6": true
+        "browser": true,
+        "es2021": true
     },
+    "extends": [
+        "google",
+        "plugin:prettier/recommended" // Make sure this is always the last
+    ],
+    "plugins": ["prettier"],
     "parserOptions": {
-        "ecmaVersion": 2018,
+        "ecmaVersion": "latest",
         "sourceType": "module"
+    },
+    "rules": {
+        "prettier/prettier": ["error"]
     }
 }

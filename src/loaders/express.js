@@ -7,7 +7,7 @@ export default app => {
     /**
      * Serve static resources
      */
-    app.use(express.static('public')); //Serves resources from public folder
+    app.use(express.static('public')); // Serves resources from public folder
 
     /**
      * Add Health Check endpoints
@@ -66,7 +66,7 @@ export default app => {
         }
         return next(err);
     });
-    app.use((err, req, res, next) => {
+    app.use((err, req, res) => {
         res.status(err.status || 500);
         res.json({
             errors: {

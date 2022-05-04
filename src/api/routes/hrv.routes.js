@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { Container } from 'typedi';
-import HRVService from '../../services/hrv';
 
 const route = Router();
 
@@ -12,7 +11,7 @@ export default app => {
         logger.debug('Calling the HRV service endpoint with body: %o', req.body);
 
         try {
-            const hrvServiceInstance = new HRVService();
+            const hrvServiceInstance = Container.get('HRVService');
             const hrv = await hrvServiceInstance.read();
             return res.json(hrv);
         } catch (error) {

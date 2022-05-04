@@ -21,7 +21,7 @@ export default app => {
             const hrv = await hrvServiceInstance.read();
 
             // TODO: move this to it's own service or implement a controller model as well
-            let df = createDataFrame(steps, hrv);
+            const df = createDataFrame(steps, hrv);
             return res.json(df);
         } catch (e) {
             logger.error('Error in the Step router: %o', error);
@@ -29,20 +29,27 @@ export default app => {
         }
     });
 
+    /**
+     * Creates a DataFrame
+     *
+     * @param {array} steps
+     * @param {array} hrv
+     * @return {object} df - A single merged DataFrame
+     */
     function createDataFrame(steps, hrv) {
         const logger = Container.get('logger');
 
         try {
-            let step_data = JSON.parse(JSON.stringify(steps));
-            let hrv_data = JSON.parse(JSON.stringify(hrv));
+            const stepData = JSON.parse(JSON.stringify(steps));
+            const hrvData = JSON.parse(JSON.stringify(hrv));
 
-            let df_steps = new dfd.DataFrame(step_data);
-            let df_hrv = new dfd.DataFrame(hrv_data);
+            const dfSteps = new dfd.DataFrame(stepData);
+            const dfHrv = new dfd.DataFrame(hrvData);
 
-            let df_merge = dfd.merge({ left: df_steps, right: df_hrv, on: ['date'], how: 'inner' });
-            df_merge.rename({ value: 'steps', value_1: 'hrv' }, { inplace: true });
-            let df_tail = df_merge.tail(25);
-            let df = dfd.toJSON(df_tail);
+            const dfMerge = dfd.merge({ left: dfSteps, right: dfHrv, on: ['date'], how: 'inner' });
+            dfMerge.rename({ value: 'steps', value_1: 'hrv' }, { inplace: true });
+            const dfTail = dfMerge.tail(25);
+            const df = dfd.toJSON(dfTail);
             return df;
         } catch (e) {
             logger.error('Error creating a Data Frame in the mix route: %o', e);

@@ -1,13 +1,14 @@
-import 'reflect-metadata'; // We need this for decorators ... but ...
-import 'module-alias/register';
-import 'dotenv/config';
+import app from './server';
+import config from './config';
+import Logger from './loaders/logger';
 
-import express from 'express';
-
-const app = express();
-async function startServer() {
-    await require('./loaders').default(app);
-}
-
-startServer();
-export default app;
+app.listen(config.port, () => {
+    Logger.info(`
+    ##################################################
+        Server listening on port: ${config.port}
+    ##################################################
+`);
+}).on('error', err => {
+    Logger.error(err);
+    process.exit(1);
+});
